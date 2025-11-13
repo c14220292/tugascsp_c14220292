@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { supabase, Barang } from "@/lib/supabaseClient";
+import { Barang } from "@/lib/supabaseClient";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -13,16 +13,16 @@ export default function ProductDetail() {
 
     useEffect(() => {
         async function fetchProduct() {
-            const { data, error } = await supabase
-                .from("barang")
-                .select("*")
-                .eq("id", params.id)
-                .maybeSingle();
-
-            if (error) {
+            try {
+                const response = await fetch(`/api/barang/${params.id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setProduct(data);
+                } else {
+                    console.error("Error fetching product");
+                }
+            } catch (error) {
                 console.error("Error fetching product:", error);
-            } else {
-                setProduct(data);
             }
             setLoading(false);
         }

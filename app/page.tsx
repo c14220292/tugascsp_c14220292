@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase, Barang } from "@/lib/supabaseClient";
+import { Barang } from "@/lib/supabaseClient";
 import ProductCard from "@/components/ProductCard";
 
 export default function Home() {
@@ -10,15 +10,16 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchProducts() {
-      const { data, error } = await supabase
-        .from("barang")
-        .select("*")
-        .order("id", { ascending: true });
-
-      if (error) {
+      try {
+        const response = await fetch("/api/barang");
+        if (response.ok) {
+          const data = await response.json();
+          setProducts(data);
+        } else {
+          console.error("Error fetching products");
+        }
+      } catch (error) {
         console.error("Error fetching products:", error);
-      } else {
-        setProducts(data || []);
       }
       setLoading(false);
     }
